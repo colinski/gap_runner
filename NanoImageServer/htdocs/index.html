@@ -57,10 +57,9 @@
         
         function startStream(){
             if(stream==false){
-                //refreshInterval = setInterval(refreshImages, 250);
-                ws = new WebSocket("ws://"+ip+":8111/");
-                ws.onmessage = function (event) {console.log(event.data); refreshImages(event.data);}
-                //ws.onopen = function (event) {ws.send("ready");}
+                refreshInterval = setInterval(function () {frame_count++;console.log(frame_count); refreshImages(frame_count);}, 250);
+                //ws = new WebSocket("ws://"+ip+":8111/");
+                //ws.onmessage = function (event) {console.log(event.data); refreshImages(event.data);}
                 console.log(ws)
                 stream=true;
             }
@@ -68,8 +67,8 @@
 
         function stopStream(){
             if(stream==true){
-                //clearInterval(refreshInterval);
-                ws.close();
+                clearInterval(refreshInterval);
+                //ws.close();
                 stream=false;
             }
         }
