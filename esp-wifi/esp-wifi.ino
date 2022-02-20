@@ -16,6 +16,24 @@
 */
 
 /****************************************************************************************************************************
+  Before compiling: Use the library manager to install ESP_WiFiManager_Lite. 
+  The steps to use are as follows:
+
+  1. Use the arduino library manager to install the library "ESP_WiFiManager_Lite." 
+  2. Update esp-wifi.ino line with the IP address of the nano server
+  3. Flash the new firmware and open the serial monitor to view status.
+  4. On first boot, wifi credentials should not be found. The 8266 will start up 
+     in AP mode with an sid of the form ESP_XXXXX and password "qwertyuiop". 
+  5. Use a device to connect to this SID and then go to 10.0.0.1 in a browser. 
+     The 8266 will display a wifi configuration page. Complete the form with the 
+     SID and password for your network. Press save and the credentials will be saved 
+     across re-boots and flashes.
+  6. The 8266 will restart and connect to the AP you indicated. It will do this on 
+     every subsequent boot. When the configured AP is not in range, it should boot 
+     into AP mode again to let you reselect a new network.
+  7. To get to sync with the gap8 after entering wifi settings, you might need to 
+     reboot both devices.
+  
   ESP_WiFiManager_Lite (https://github.com/khoih-prog/ESP_WiFiManager_Lite) is a library 
   for the ESP32/ESP8266 boards to enable store Credentials in EEPROM/SPIFFS/LittleFS for easy 
   configuration/reconfiguration and autoconnect/autoreconnect of WiFi and other services without Hardcoding.
