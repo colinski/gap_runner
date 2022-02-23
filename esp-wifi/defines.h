@@ -13,6 +13,10 @@
 #ifndef defines_h
 #define defines_h
 
+#define USE_WIFI_MANAGER false
+#define MANUAL_SSID "Eureka"
+#define MANUAL_PASS "WelcomeEureka"
+
 #if !( ESP8266 || ESP32)
   #error This code is intended to run only on the ESP8266/ESP32 boards ! Please check your Tools->Board setting.
 #endif
@@ -29,7 +33,7 @@
   
   // Number of seconds after reset during which a
   // subseqent reset will be considered a double reset.
-  #define MRD_TIMEOUT                   10
+  #define MRD_TIMEOUT                   1
   
   // RTC Memory Address for the DoubleResetDetector to use
   #define MRD_ADDRESS                   0
@@ -42,7 +46,7 @@
   
   // Number of seconds after reset during which a
   // subseqent reset will be considered a double reset.
-  #define DRD_TIMEOUT                   10
+  #define DRD_TIMEOUT                   1
   
   // RTC Memory Address for the DoubleResetDetector to use
   #define DRD_ADDRESS                   0
@@ -137,5 +141,7 @@
 #else
   #define LED_PIN     13
 #endif
+
+
 
 #endif      //defines_h
