@@ -13,7 +13,7 @@
 
 sudo docker run -it\
     --network host \
-    --privileged \
+    --privileged --runtime nvidia \
     -v $PWD:/root/gap_runner \
     nvcr.io/nvidia/l4t-ml:r32.5.0-py3 \
     python3 -u /root/gap_runner/nano/server.py
