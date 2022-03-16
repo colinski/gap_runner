@@ -5,7 +5,7 @@ import lap
 def match(dets, tracks, iou_thres=0.3):
     unmatched_dets = np.arange(len(dets)) #all idx are unmatched to start
     
-    if len(tracks) == 0:
+    if len(dets) == 0 or len(tracks) == 0:
         return np.empty((0, 2)), unmatched_dets
     
     #compute matching using IoU as metric

@@ -1,6 +1,6 @@
 import numpy as np
-from kalman_track import KalmanTrack
-from hungarian import match
+from .kalman_track import KalmanTrack
+from .hungarian import match
 
 class SORT(object):
     def __init__(self, max_age=1, min_hits=3, iou_thres=0.3):
@@ -50,4 +50,4 @@ class SORT(object):
         #remove tracks that have expired
         self.tracks = [track for track in self.tracks\
                        if track.time_since_update < self.max_age]
-        return ret
+        return ret.astype(int)

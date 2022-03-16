@@ -53,11 +53,17 @@ def prune_dets(dets, score_thres=0.3, valid_classes=CLASSES):
     #mask = score_mask & label_mask #both must be true
     return dets[mask]
 
-def draw_dets(img, dets, color=(255, 255, 0)):
+def draw_dets(img, dets, color=(255, 255, 0), istracks=False):
     for det in dets:
         b0, b1, b2, b3 = det[0:4]
-        score = det[4]
-        label = CLASSES[det[5]]
+
+        if istracks:
+            text = str(det[4])
+        else:
+            score = det[4]
+            label = CLASSES[det[5]]
+            text = '%s: %s' % (label, score)
+
         img = cv2.rectangle(img,
             (b0, b1),
             (b2, b3),
@@ -65,7 +71,7 @@ def draw_dets(img, dets, color=(255, 255, 0)):
             thickness=1
         )
         img = cv2.putText(img,
-            '%s: %s' % (label, score),
+            text,
             (b0, b1 - 4),
             cv2.FONT_HERSHEY_SIMPLEX,
             0.5,
