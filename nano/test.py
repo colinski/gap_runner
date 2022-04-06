@@ -4,12 +4,16 @@ from tqdm import tqdm, trange
 import time
 
 
-model = '/root/gap_runner/nano/suffix.onnx'
-sess = ort.InferenceSession(model, providers=['CPUExecutionProvider'])
-#sess = ort.InferenceSession(model, providers=['CUDAExecutionProvider'])
+#model = '/root/gap_runner/nano/suffix.onnx'
+#img = np.zeros((1, 32, 28, 28), dtype=np.float32)
+
+model = '/root/gap_runner/gap/prefix.onnx'
+img = np.zeros((1, 1, 224, 224), dtype=np.float32)
+
+#sess = ort.InferenceSession(model, providers=['CPUExecutionProvider'])
+sess = ort.InferenceSession(model, providers=['CUDAExecutionProvider'])
 # sess = ort.InferenceSession(model, providers=['TensorrtExecutionProvider'])
 
-img = np.zeros((1, 32, 28, 28), dtype=np.float32)
 
 input_name = sess.get_inputs()[0].name
 
