@@ -36,7 +36,6 @@ class SORT(object):
             
         #collect final outputs
         states, ids = [np.empty((0,4))], []
-        #states, ids = [], []
         for track in self.tracks:
             onstreak = track.hit_streak >= self.min_hits
             warmingup = self.frame_count <= self.min_hits
