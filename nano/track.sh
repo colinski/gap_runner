@@ -16,4 +16,4 @@ sudo docker run -it\
     --privileged --runtime nvidia \
     -v $PWD:/root/gap_runner \
     nano_server:latest \
-    python3 -u /root/gap_runner/nano/track.py
+    python3 -u /root/gap_runner/nano/track.py /root/gap_runner/nano/suffix.trt 
