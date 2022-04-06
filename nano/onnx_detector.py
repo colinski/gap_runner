@@ -1,62 +1,25 @@
-import ctypes
+import onnxruntime as ort
 import numpy as np
-import tensorrt as trt
-import pycuda.autoinit  # This is needed for initializing CUDA driver
-import pycuda.driver as cuda
-from inference import nms_boxes, prune_dets
-from mem import HostDeviceMem, get_input_shape, allocate_buffers, do_inference
 import time
+#from inference import HostDeviceMem, get_input_shape, allocate_buffers, do_inference, nms_boxes, prune_dets
+from inference import nms_boxes, prune_dets
 
-class TRTDetector(object):
-    def _load_engine(self):
-        with open(self.model, 'rb') as f, trt.Runtime(self.trt_logger) as runtime:
-            return runtime.deserialize_cuda_engine(f.read())
 
-    def __init__(self, model, category_num=80, num_dets=50, cuda_ctx=None):
+class ONNXDetector(object):
+    def __init__(self, model, category_num=80, num_dets=50):
         """Initialize TensorRT plugins, engine and conetxt."""
         self.model = model
+        self.sess = ort.InferenceSession(self.model, providers=['CPUExecutionProvider'])
         self.category_num = category_num
-        self.cuda_ctx = cuda_ctx
-        if self.cuda_ctx:
-            self.cuda_ctx.push()
-        self.inference_fn = do_inference
-        self.trt_logger = trt.Logger(trt.Logger.INFO)
-        self.engine = self._load_engine()
-        self.input_shape = get_input_shape(self.engine)
+        #self.input_shape = get_input_shape(self.engine)
         self.num_dets = num_dets
         self.timings = []
 
-        try:
-            self.context = self.engine.create_execution_context()
-            self.inputs, self.outputs, self.bindings, self.stream = allocate_buffers(self.engine)
-        except Exception as e:
-            raise RuntimeError('fail to allocate CUDA resources') from e
-        finally:
-            if self.cuda_ctx:
-                self.cuda_ctx.pop()
-
-    def __del__(self):
-        """Free CUDA memories."""
-        del self.outputs
-        del self.inputs
-        del self.stream
-
-    def preprocess(self, img, input_shape):
+    def preprocess(self, img):
         return img
-        # img = cv2.resize(img, (input_shape[1], input_shape[0]))
-        # img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB).astype(np.float32)
-        # mean = np.array([123.675, 116.28, 103.53]).astype(np.float32)
-        # std = np.array([58.395, 57.12, 57.375]).astype(np.float32)
-        # mean = np.expand_dims(mean, axis=(0, 1))
-        # std = np.expand_dims(std, axis=(0, 1))
-        # img = (img - mean) / std
-        # img = img.transpose((2, 0, 1))
-        # img = np.expand_dims(img, axis=0)
-        # return img
-        
+    
     #[[x, y, w, h, box_confidence, class_id, class_prob],
-
-    def postprocess(self, outputs, img_w, img_h, input_shape):
+    def postprocess(self, outputs, img_w, img_h):
         img_w, img_h = 224, 224
         # scale_x = img_w / input_shape[1]
         # scale_y = img_h / input_shape[0]
@@ -127,28 +90,28 @@ class TRTDetector(object):
         timing = {}
         
         start = time.time()
-        img_resized = self.preprocess(img, self.input_shape)
-        self.inputs[0].host = np.ascontiguousarray(img_resized)
-        if self.cuda_ctx:
-            self.cuda_ctx.push()
+        img = self.preprocess(img)
+        img = np.ascontiguousarray(img)
+        #self.inputs[0].host = np.ascontiguousarray(img_resized)
+
         timing['preprocess'] = time.time() - start
         
         start = time.time()
-        outputs = self.inference_fn(
-            context=self.context,
-            bindings=self.bindings,
-            inputs=self.inputs,
-            outputs=self.outputs,
-            stream=self.stream
-        )
-        if self.cuda_ctx:
-            self.cuda_ctx.pop()
+        
+        input_name = self.sess.get_inputs()[0].name
+        outputs = self.sess.run([], {input_name: img})[0]
+        # outputs = self.inference_fn(
+            # context=self.context,
+            # bindings=self.bindings,
+            # inputs=self.inputs,
+            # outputs=self.outputs,
+            # stream=self.stream
+        # )
         timing['model'] = time.time() - start
 
         start = time.time()
         detections = self.postprocess(
             outputs, img.shape[1], img.shape[0], 
-            input_shape=self.input_shape
         )
         timing['postprocess'] = time.time() - start
         self.timings.append(timing)

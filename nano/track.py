@@ -1,10 +1,7 @@
-import shutil
-import os
 import socket
 import time 
 import numpy as np
 import cv2
-from trt_detector import TRTDetector
 from sort import SORT
 from network import buff2numpy
 from inference import draw_dets, write_dets
@@ -336,20 +333,28 @@ if __name__ == '__main__':
     use_xavier = False
 
     print("Booting up nano detection server")
-    trt_file = "/root/gap_runner/nano/"
+    # trt_file = "/root/gap_runner/nano/"
 
-    if from_img:
-        trt_file = trt_file + "full"
-    else:
-        trt_file = trt_file + "suffix"
+    # if from_img:
+        # trt_file = trt_file + "full"
+    # else:
+        # trt_file = trt_file + "suffix"
 
-    if(use_xavier): 
-        trt_file = trt_file + "_xavier.trt"
-    else:
-        trt_file = trt_file + ".trt"        
+    # if(use_xavier): 
+        # trt_file = trt_file + "_xavier.trt"
+    # else:
+        # trt_file = trt_file + ".trt"        
+    
+    suffix_file = sys.argv[1]
 
-    detector = TRTDetector(trt_file)
-    print("TRT modelfile %s opened"%trt_file)
+    if 'trt' in suffix_file:
+        from trt_detector import TRTDetector
+        detector = TRTDetector(suffix_file)
+    elif 'onnx' in suffix_file:
+        from onnx_detector import ONNXDetector
+        detector = ONNXDetector(suffix_file)
+
+    print("suffix modelfile %s opened" % suffix_file)
     
     tracker = SORT(max_age=1, min_hits=3, iou_thres=0.3)
     
